@@ -68,7 +68,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             <?php $__empty_1 = true; $__currentLoopData = $gages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $gage): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="hover:bg-gray-50 <?php echo e($gage->isOverdue ? 'bg-red-50' : ''); ?>">
+                <tr class="transition-colors <?php echo e($gage->isOverdue ? 'bg-red-50 hover:bg-red-100' : 'odd:bg-white even:bg-gray-100 hover:bg-blue-50'); ?>">
                     <td class="table-td">
                         <a href="<?php echo e(route('gages.edit', $gage->id)); ?>" class="text-brand-600 hover:text-brand-800" title="Edit">✏️</a>
                     </td>

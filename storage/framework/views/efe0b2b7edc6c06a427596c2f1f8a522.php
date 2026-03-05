@@ -18,7 +18,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             <?php $__empty_1 = true; $__currentLoopData = $procedures; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $procedure): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="<?php echo e(route('procedures.edit', $procedure->id)); ?>" class="text-brand-600">✏️</a></td>
                     <td class="table-td font-medium"><?php echo e($procedure->name); ?></td>
                     <td class="table-td text-gray-500 text-xs"><?php echo e(Str::limit($procedure->description, 80)); ?></td>

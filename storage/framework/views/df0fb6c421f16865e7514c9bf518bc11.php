@@ -44,13 +44,12 @@
                 <th class="table-th">Date Calibrated</th>
                 <th class="table-th">Calibrated By</th>
                 <th class="table-th">Status</th>
-                <th class="table-th">Passed</th>
                 <th class="table-th">Certificate</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
             <?php $__empty_1 = true; $__currentLoopData = $calibrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td">
                         <a href="<?php echo e(route('calibrations.edit', $cal->id)); ?>" class="text-brand-600 hover:text-brand-800">✏️</a>
                     </td>
@@ -59,12 +58,14 @@
                     </td>
                     <td class="table-td"><?php echo e($cal->dateCalibrated?->format('Y-m-d')); ?></td>
                     <td class="table-td text-gray-500"><?php echo e($cal->calibrationBy?->value); ?></td>
-                    <td class="table-td text-gray-500"><?php echo e($cal->calibrationStatus?->value); ?></td>
                     <td class="table-td">
+                        <?php $status = $cal->calibrationStatus?->value; ?>
                         <?php if($cal->isPassed): ?>
-                            <span class="text-green-600 font-semibold">✓ Pass</span>
+                            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700"><?php echo e($status ?? 'Passed'); ?></span>
+                        <?php elseif($status): ?>
+                            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700"><?php echo e($status); ?></span>
                         <?php else: ?>
-                            <span class="text-red-500">✗ Fail</span>
+                            <span class="text-gray-300">—</span>
                         <?php endif; ?>
                     </td>
                     <td class="table-td">

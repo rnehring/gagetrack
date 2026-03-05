@@ -37,7 +37,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             <?php $__empty_1 = true; $__currentLoopData = $records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="<?php echo e(route('metadata.edit', $record->id)); ?>" class="text-brand-600">✏️</a></td>
                     <td class="table-td font-medium text-gray-500"><?php echo e($record->category); ?></td>
                     <td class="table-td"><?php echo e($record->value); ?></td>
