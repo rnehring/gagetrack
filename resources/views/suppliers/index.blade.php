@@ -22,7 +22,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($suppliers as $supplier)
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="{{ route('suppliers.edit', $supplier->id) }}" class="text-brand-600 hover:text-brand-800">✏️</a></td>
                     <td class="table-td font-medium">
                         <a href="{{ route('suppliers.edit', $supplier->id) }}" class="text-brand-700 hover:underline">{{ $supplier->name }}</a>

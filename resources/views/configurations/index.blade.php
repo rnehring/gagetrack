@@ -15,7 +15,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($configurations as $config)
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="{{ route('configurations.edit', $config->id) }}" class="text-brand-600">✏️</a></td>
                     <td class="table-td font-medium">{{ $config->name }}</td>
                     <td class="table-td text-gray-600">{{ $config->value }}</td>

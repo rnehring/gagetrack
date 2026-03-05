@@ -45,13 +45,12 @@
                 <th class="table-th">Date Calibrated</th>
                 <th class="table-th">Calibrated By</th>
                 <th class="table-th">Status</th>
-                <th class="table-th">Passed</th>
                 <th class="table-th">Certificate</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($calibrations as $cal)
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td">
                         <a href="{{ route('calibrations.edit', $cal->id) }}" class="text-brand-600 hover:text-brand-800">✏️</a>
                     </td>
@@ -60,12 +59,14 @@
                     </td>
                     <td class="table-td">{{ $cal->dateCalibrated?->format('Y-m-d') }}</td>
                     <td class="table-td text-gray-500">{{ $cal->calibrationBy?->value }}</td>
-                    <td class="table-td text-gray-500">{{ $cal->calibrationStatus?->value }}</td>
                     <td class="table-td">
+                        @php $status = $cal->calibrationStatus?->value; @endphp
                         @if($cal->isPassed)
-                            <span class="text-green-600 font-semibold">✓ Pass</span>
+                            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700">{{ $status ?? 'Passed' }}</span>
+                        @elseif($status)
+                            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">{{ $status }}</span>
                         @else
-                            <span class="text-red-500">✗ Fail</span>
+                            <span class="text-gray-300">—</span>
                         @endif
                     </td>
                     <td class="table-td">

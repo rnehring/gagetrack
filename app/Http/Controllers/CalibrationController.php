@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calibration;
+use App\Models\CalibrationMeasurement;
 use App\Models\Gage;
 use App\Models\Metadata;
 use Illuminate\Http\Request;
@@ -91,6 +92,10 @@ class CalibrationController extends Controller
 
     public function edit(Calibration $calibration)
     {
+        $measurements = CalibrationMeasurement::where('calibrationId', $calibration->id)
+            ->orderBy('id')
+            ->get();
+
         return view('calibrations.form', [
             'calibration' => $calibration,
             'gage' => $calibration->gage,
@@ -100,6 +105,7 @@ class CalibrationController extends Controller
             'calibrationTypes' => Metadata::byCategory('calibrationTypes'),
             'foundConditions' => Metadata::byCategory('foundConditions'),
             'frequencyUnits' => Metadata::byCategory('frequencyUnits'),
+            'measurements' => $measurements,
         ]);
     }
 

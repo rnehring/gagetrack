@@ -30,7 +30,7 @@
                 @php
                     $daysOverdue = $gage->dateDue ? now()->diffInDays($gage->dateDue, false) * -1 : null;
                 @endphp
-                <tr class="hover:bg-red-50 bg-red-50/50">
+                <tr class="transition-colors odd:bg-red-50/30 even:bg-red-50/60 hover:bg-red-100">
                     <td class="table-td font-medium text-red-700">{{ $gage->gageNumber }}</td>
                     <td class="table-td text-gray-500">{{ $gage->serialNumber }}</td>
                     <td class="table-td text-gray-700">{{ $gage->description }}</td>

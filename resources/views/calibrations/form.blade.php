@@ -166,4 +166,47 @@
     </div>
 </form>
 
+@if(isset($measurements) && $measurements->count() > 0)
+<div class="mt-6 bg-white rounded-xl shadow border border-gray-100 p-5">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider border-b pb-2 mb-4">
+        Measurement Data
+        <span class="ml-2 text-xs font-normal text-gray-400">({{ $measurements->count() }} readings imported from legacy system)</span>
+    </h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                <tr>
+                    <th class="px-3 py-2">Standard Used</th>
+                    <th class="px-3 py-2">Type</th>
+                    <th class="px-3 py-2">Min</th>
+                    <th class="px-3 py-2">Nominal</th>
+                    <th class="px-3 py-2">Max</th>
+                    <th class="px-3 py-2">Before</th>
+                    <th class="px-3 py-2">After</th>
+                    <th class="px-3 py-2">Uncertainty</th>
+                    <th class="px-3 py-2">Units</th>
+                    <th class="px-3 py-2">Comments</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @foreach($measurements as $m)
+                <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-2 font-mono text-xs">{{ $m->standardUsed }}</td>
+                    <td class="px-3 py-2">{{ $m->measurementType }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ $m->limitMin !== null ? number_format($m->limitMin, 4) : '' }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ $m->nominal !== null ? number_format($m->nominal, 4) : '' }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ $m->limitMax !== null ? number_format($m->limitMax, 4) : '' }}</td>
+                    <td class="px-3 py-2 text-right font-mono {{ $m->measurementBefore !== null && $m->limitMin !== null && $m->measurementBefore < $m->limitMin ? 'text-red-600 font-bold' : '' }}">{{ $m->measurementBefore !== null ? number_format($m->measurementBefore, 4) : '' }}</td>
+                    <td class="px-3 py-2 text-right font-mono {{ $m->measurementAfter !== null && $m->limitMax !== null && $m->measurementAfter > $m->limitMax ? 'text-red-600 font-bold' : '' }}">{{ $m->measurementAfter !== null ? number_format($m->measurementAfter, 4) : '' }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ $m->uncertainty !== null ? number_format($m->uncertainty, 4) : '' }}</td>
+                    <td class="px-3 py-2">{{ $m->units }}</td>
+                    <td class="px-3 py-2 text-xs text-gray-500">{{ $m->comments }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
 @endsection

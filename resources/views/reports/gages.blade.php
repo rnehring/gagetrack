@@ -70,7 +70,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($gages as $gage)
-                <tr class="hover:bg-gray-50 {{ $gage->isOverdue ? 'bg-red-50' : '' }}">
+                <tr class="transition-colors {{ $gage->isOverdue ? 'bg-red-50 hover:bg-red-100' : 'odd:bg-white even:bg-gray-100 hover:bg-blue-50' }}">
                     <td class="table-td font-medium">
                         <a href="{{ route('gages.edit', $gage->id) }}" class="text-brand-700 hover:underline">{{ $gage->gageNumber }}</a>
                     </td>

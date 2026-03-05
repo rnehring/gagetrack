@@ -38,10 +38,14 @@
             <input type="password" name="password" class="form-input" {{ !$user ? 'required' : '' }}>
         </div>
 
-        <div class="flex gap-6">
+        <div class="flex gap-6 flex-wrap">
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" name="isActive" value="1" @checked(old('isActive', $user?->isActive ?? true)) class="rounded">
                 <span class="text-sm font-medium text-gray-700">Active</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="isActive_master" value="1" @checked(old('isActive_master', $user?->isActive_master ?? true)) class="rounded">
+                <span class="text-sm font-medium text-gray-700">Master Active <span class="text-xs text-gray-400">(system-level)</span></span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" name="isHidden" value="1" @checked(old('isHidden', $user?->isHidden)) class="rounded">

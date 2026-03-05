@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Calibration;
 use App\Models\Gage;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -65,6 +67,20 @@ class CalendarController extends Controller
             ]);
         }
 
-        return view('calendar.index', compact('calendar', 'year', 'overdueCount'));
+        $totalGages       = Gage::where('isActive', 1)->count();
+        $currentGages     = Gage::where('isActive', 1)
+                               ->whereRaw("dateDue >= CURDATE()")
+                               ->whereRaw("dateDue != '0000-00-00'")
+                               ->count();
+        $failedGages      = Gage::where('isActive', 1)
+                               ->whereHas('calibrations', fn($q) => $q->where('isPassed', 0)
+                                   ->whereRaw('id = (SELECT MAX(id) FROM calibrations c2 WHERE c2.gageId = calibrations.gageId)'))
+                               ->count();
+        $activeSuppliers  = Supplier::where('isActive', 1)->count();
+
+        return view('calendar.index', compact(
+            'calendar', 'year', 'overdueCount',
+            'totalGages', 'currentGages', 'failedGages', 'activeSuppliers'
+        ));
     }
 }

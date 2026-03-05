@@ -18,7 +18,7 @@ class Calibration extends Model
 
     protected $casts = [
         'isPassed' => 'boolean',
-        'dateCalibrated' => 'date',
+        'dateCalibrated' => 'datetime',
     ];
 
     public function gage()

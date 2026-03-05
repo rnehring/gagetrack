@@ -11,14 +11,15 @@ class User extends Authenticatable
 
     protected $fillable = [
         'nameFirst', 'nameLast', 'username', 'emailAddress',
-        'password', 'isActive', 'isHidden',
+        'password', 'isActive', 'isActive_master', 'isHidden',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = ['password', 'oldPassword'];
 
     protected $casts = [
-        'isActive' => 'boolean',
-        'isHidden' => 'boolean',
+        'isActive'        => 'boolean',
+        'isActive_master' => 'boolean',
+        'isHidden'        => 'boolean',
     ];
 
     public function getNameAttribute(): string
@@ -27,8 +28,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Verify password using the legacy hash algorithm from the old app.
-     * Uses crypt() with SHA-256 and an MD5-derived salt.
+     * Legacy hash algorithm from the old app.
+     * Uses crypt() SHA-256 with an MD5-derived salt.
      */
     public static function legacyPasswordHash(string $username, string $password): string
     {
@@ -42,5 +43,18 @@ class User extends Authenticatable
     {
         $hash = self::legacyPasswordHash($this->username, $password);
         return $this->password === $hash;
+    }
+
+    /**
+     * A user is loginable only when both flags are active.
+     */
+    public function getIsLoginableAttribute(): bool
+    {
+        return (bool) $this->isActive && (bool) $this->isActive_master;
+    }
+
+    public function metadata(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserMetadata::class, 'id', 'id');
     }
 }

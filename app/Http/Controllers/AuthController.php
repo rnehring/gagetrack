@@ -24,6 +24,7 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)
             ->where('isActive', 1)
+            ->where('isActive_master', 1)
             ->first();
 
         if ($user && $user->verifyPassword($request->password)) {
@@ -53,7 +54,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'current_password' => 'required|string',
-            'new_password' => 'required|string|min:6|confirmed',
+            'new_password'     => 'required|string|min:6|confirmed',
         ]);
 
         $sessionUser = session('user');

@@ -19,7 +19,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($procedures as $procedure)
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="{{ route('procedures.edit', $procedure->id) }}" class="text-brand-600">✏️</a></td>
                     <td class="table-td font-medium">{{ $procedure->name }}</td>
                     <td class="table-td text-gray-500 text-xs">{{ Str::limit($procedure->description, 80) }}</td>

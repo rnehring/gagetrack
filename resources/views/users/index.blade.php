@@ -16,12 +16,13 @@
                 <th class="table-th">Username</th>
                 <th class="table-th">Email</th>
                 <th class="table-th">Active</th>
+                <th class="table-th">Master</th>
                 <th class="table-th w-8"></th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($users as $user)
-                <tr class="hover:bg-gray-50">
+                <tr class="odd:bg-white even:bg-gray-100 hover:bg-blue-50 transition-colors">
                     <td class="table-td"><a href="{{ route('users.edit', $user->id) }}" class="text-brand-600">✏️</a></td>
                     <td class="table-td font-medium">{{ $user->nameLast }}, {{ $user->nameFirst }}</td>
                     <td class="table-td text-gray-500">{{ $user->username }}</td>
@@ -31,6 +32,13 @@
                             <span class="text-green-600">✓</span>
                         @else
                             <span class="text-gray-300">—</span>
+                        @endif
+                    </td>
+                    <td class="table-td">
+                        @if($user->isActive_master)
+                            <span class="text-green-600">✓</span>
+                        @else
+                            <span class="text-red-400">✕</span>
                         @endif
                     </td>
                     <td class="table-td">
