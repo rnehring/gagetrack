@@ -13,9 +13,10 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('calendar.index')
-        : redirect()->route('login');
+    if (session()->has('user')) {
+        return redirect()->route('calendar.index');
+    }
+    return redirect()->route('login');
 });
 
 // Auth routes
@@ -26,8 +27,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Protected routes
 Route::middleware('auth.gagetrack')->group(function () {
 
-    // Home → calendar
-    Route::get('/', fn() => redirect()->route('calendar.index'));
+
 
     // Calendar
     Route::get('/calendar/{year?}', [CalendarController::class, 'index'])->name('calendar.index');
