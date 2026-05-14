@@ -33,16 +33,29 @@ class UserController extends Controller
             'isHidden'        => 'nullable|boolean',
         ]);
 
-        $validated['password']        = User::legacyPasswordHash($validated['username'], $validated['password']);
-        $validated['isActive']        = $request->boolean('isActive');
-        $validated['isActive_master'] = $request->boolean('isActive_master', true);
-        $validated['isHidden']        = $request->boolean('isHidden');
+        $password       = User::legacyPasswordHash($validated['username'], $validated['password']);
+        $isActive       = $request->boolean('isActive');
+        $isActiveMaster = $request->boolean('isActive_master', true);
+        $isHidden       = $request->boolean('isHidden');
 
-        DB::transaction(function () use ($validated) {
-            $user = User::create($validated);
+        // users is a VIEW over employees.logins + usermetadata — write to base tables directly
+        DB::transaction(function () use ($validated, $password, $isActive, $isActiveMaster, $isHidden) {
+            $id = DB::table('employees.logins')->insertGetId([
+                'nameFirst'       => $validated['nameFirst'],
+                'nameLast'        => $validated['nameLast'],
+                'username'        => $validated['username'],
+                'emailAddress'    => $validated['emailAddress'] ?? '',
+                'password'        => $password,
+                'oldPassword'     => '',
+                'isActive'        => $isActiveMaster,
+                'updatedByUserId' => auth()->id() ?? 0,
+                'phoneCarrierId'  => 0,
+                'phoneNumber'     => '',
+            ]);
+
             UserMetadata::updateOrCreate(
-                ['id' => $user->id],
-                ['isActive' => $validated['isActive'], 'isHidden' => $validated['isHidden']]
+                ['id' => $id],
+                ['isActive' => $isActive, 'isHidden' => $isHidden]
             );
         });
 
@@ -77,7 +90,19 @@ class UserController extends Controller
         }
 
         DB::transaction(function () use ($user, $validated) {
-            $user->update($validated);
+            $loginsData = [
+                'nameFirst'       => $validated['nameFirst'],
+                'nameLast'        => $validated['nameLast'],
+                'username'        => $validated['username'],
+                'emailAddress'    => $validated['emailAddress'] ?? '',
+                'isActive'        => $validated['isActive_master'],
+                'updatedByUserId' => auth()->id() ?? 0,
+            ];
+            if (isset($validated['password'])) {
+                $loginsData['password'] = $validated['password'];
+            }
+            DB::table('employees.logins')->where('id', $user->id)->update($loginsData);
+
             UserMetadata::updateOrCreate(
                 ['id' => $user->id],
                 ['isActive' => $validated['isActive'], 'isHidden' => $validated['isHidden']]
@@ -91,7 +116,7 @@ class UserController extends Controller
     {
         DB::transaction(function () use ($user) {
             UserMetadata::where('id', $user->id)->delete();
-            $user->delete();
+            DB::table('employees.logins')->where('id', $user->id)->delete();
         });
         return redirect()->route('users.index')->with('success', 'User deleted.');
     }
