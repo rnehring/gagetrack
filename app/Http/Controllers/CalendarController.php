@@ -6,17 +6,20 @@ use App\Models\Calibration;
 use App\Models\Gage;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class CalendarController extends Controller
 {
     public function index(Request $request, int $year = null)
     {
-        $year         = $year ?? (int) date('Y');
-        $currentYear  = (int) date('Y');
-        $currentMonth = (int) date('n');
+        $year = $year ?? (int) date('Y');
 
-        // Gages with a due date falling within the requested year
+        // Gages with a due date falling within the requested year.
+        //
+        // A month bucket means exactly one thing: "due in this month of this year".
+        // This mirrors the legacy app (controllers/calendar.php), which selects on
+        // isActive=1 AND YEAR(dateDue) = $year and buckets by MONTH(dateDue).
+        // Nothing else may be merged into these buckets — doing so makes the per-month
+        // counts incomparable to the legacy system and meaningless on their own terms.
         $calendar = [];
         $yearGages = Gage::with(['frequencyUnit'])
             ->where('isActive', 1)
@@ -29,8 +32,13 @@ class CalendarController extends Controller
             $calendar[$month][] = $gage;
         }
 
-        // Overdue gages — active + in-service (statusId=1) with a real past date
-        $overdueGages = Gage::with(['frequencyUnit'])
+        // Overdue backlog — every active, in-service gage whose due date has passed,
+        // regardless of year. This is NOT calendar data: it is a standing worklist that
+        // is displayed in its own panel above the grid.
+        //
+        // The filter deliberately matches ReportController::backlog() exactly, so the
+        // count shown here can never disagree with the backlog report.
+        $overdueGages = Gage::with(['frequencyUnit', 'location'])
             ->where('isActive', 1)
             ->where('statusId', 1)
             ->whereRaw("dateDue < CURDATE()")
@@ -39,33 +47,6 @@ class CalendarController extends Controller
             ->get();
 
         $overdueCount = $overdueGages->count();
-
-        Log::debug('CalendarController', [
-            'year'          => $year,
-            'currentYear'   => $currentYear,
-            'currentMonth'  => $currentMonth,
-            'yearGageCount' => $yearGages->count(),
-            'overdueCount'  => $overdueCount,
-        ]);
-
-        // Pin overdue gages to the current month when viewing the current or a future year
-        if ($overdueGages->isNotEmpty() && $year >= $currentYear) {
-            $pinMonth   = ($year == $currentYear) ? $currentMonth : 1;
-            $pinned     = $calendar[$pinMonth] ?? [];
-            $pinnedIds  = array_flip(array_map(fn($g) => $g->id, $pinned));
-
-            foreach ($overdueGages as $gage) {
-                if (! isset($pinnedIds[$gage->id])) {
-                    $calendar[$pinMonth][] = $gage;
-                }
-            }
-
-            Log::debug('Pinned overdue gages', [
-                'pinMonth'  => $pinMonth,
-                'pinCount'  => $overdueGages->count(),
-                'calSlot'   => count($calendar[$pinMonth] ?? []),
-            ]);
-        }
 
         $totalGages       = Gage::where('isActive', 1)->count();
         $currentGages     = Gage::where('isActive', 1)
@@ -79,7 +60,7 @@ class CalendarController extends Controller
         $activeSuppliers  = Supplier::where('isActive', 1)->count();
 
         return view('calendar.index', compact(
-            'calendar', 'year', 'overdueCount',
+            'calendar', 'year', 'overdueGages', 'overdueCount',
             'totalGages', 'currentGages', 'failedGages', 'activeSuppliers'
         ));
     }

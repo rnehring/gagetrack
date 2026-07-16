@@ -66,6 +66,61 @@
 
 </div>
 
+{{-- Overdue Backlog Panel --}}
+{{--
+    Overdue gages are deliberately NOT merged into the month grid below. A month cell
+    means "due in that month"; the backlog spans every year and belongs on its own.
+    This panel uses the same filter as the backlog report, so the counts always agree.
+--}}
+@if($overdueCount > 0)
+    <div class="bg-white rounded-xl border border-red-200 shadow-sm mb-6 overflow-hidden">
+        <button type="button"
+                onclick="toggleBacklog(this)"
+                class="w-full flex items-center justify-between gap-3 px-5 py-3 bg-red-50 hover:bg-red-100 transition-colors text-left">
+            <div class="flex items-center gap-3">
+                <div class="w-1 self-stretch rounded-full bg-red-500 shrink-0"></div>
+                <div>
+                    <div class="font-bold text-sm text-red-800 flex items-center gap-2">
+                        ⚠️ Overdue Backlog
+                        <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                            {{ number_format($overdueCount) }}
+                        </span>
+                    </div>
+                    <div class="text-xs text-red-400 mt-0.5">
+                        Past due across all years — not counted in the months below
+                    </div>
+                </div>
+            </div>
+            <span id="backlog-chevron" class="text-red-400 text-xs font-medium shrink-0">Show ▾</span>
+        </button>
+
+        <div id="backlog-body" class="hidden border-t border-red-100">
+            <div class="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                @foreach($overdueGages as $gage)
+                    @php $daysOverdue = (int) $gage->dateDue->diffInDays($today); @endphp
+                    <a href="{{ route('gages.edit', $gage->id) }}"
+                       class="group flex items-center gap-3 px-5 py-2 text-xs hover:bg-red-50 transition-colors">
+                        <span class="shrink-0 w-2 h-2 rounded-full bg-red-500"></span>
+                        <span class="font-semibold text-red-700 group-hover:underline w-20 shrink-0">
+                            {{ $gage->gageNumber }}
+                        </span>
+                        <span class="text-gray-500 truncate flex-1">{{ $gage->description }}</span>
+                        <span class="text-gray-300 truncate hidden sm:block w-28 shrink-0">{{ $gage->location?->value }}</span>
+                        <span class="text-red-500 font-medium w-20 text-right shrink-0">{{ $gage->dateDue->format('M d, Y') }}</span>
+                        <span class="text-red-300 w-24 text-right shrink-0 hidden md:block">{{ number_format($daysOverdue) }} days</span>
+                    </a>
+                @endforeach
+            </div>
+            <div class="px-5 py-2 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <span class="text-xs text-gray-400">{{ number_format($overdueCount) }} gage(s) past due</span>
+                <a href="{{ route('reports.backlog') }}" class="text-xs text-brand-600 hover:text-brand-800 hover:underline font-medium">
+                    Open backlog report →
+                </a>
+            </div>
+        </div>
+    </div>
+@endif
+
 {{-- Page Header + Year Nav --}}
 <div class="flex items-center justify-between mb-5">
     <div>
@@ -217,6 +272,13 @@
 </div>
 
 <script>
+function toggleBacklog(btn) {
+    const body    = document.getElementById('backlog-body');
+    const chevron = document.getElementById('backlog-chevron');
+    const isHidden = body.classList.toggle('hidden');
+    chevron.textContent = isHidden ? 'Show ▾' : 'Hide ▴';
+}
+
 function toggleMonth(monthId, btn) {
     const rows = document.querySelectorAll(`a.extra[data-month="${monthId}"]`);
     const isHidden = rows[0]?.classList.contains('hidden');
