@@ -178,11 +178,21 @@ class CalibrationController extends Controller
     {
         if ($request->hasFile('certificateFile') && $request->file('certificateFile')->isValid()) {
             $gage = Gage::find($calibration->gageId);
-            $filename = urlencode($gage->gageNumber) . '.pdf';
+	    $filename = $this->certificateFilename($gage->gageNumber);
             $request->file('certificateFile')->storeAs('certificates', $filename);
             $calibration->update(['certificateFilename' => $filename]);
         }
     }
+
+
+public static function certificateFilename(string $gageNumber): string
+{
+    // Replace anything that isn't a safe filename/URL char with '-'.
+    // Covers # / \ space ? % & and friends.
+    $safe = preg_replace('/[^A-Za-z0-9._-]/', '-', trim($gageNumber));
+    $safe = trim($safe, '-');           // no leading/trailing dashes
+    return ($safe ?: 'cert') . '.pdf';
+}
 
     private function updateGageDueDate(Calibration $calibration): void
     {
